@@ -15,7 +15,8 @@ var player1 = false;
 var player2 = false;
 var wins = 0;
 var losses = 0;
-
+var player1ref = database.ref('/player1');
+var player2ref = database.ref('/player2');
 
 //Starting game
 function startGame() {
@@ -38,11 +39,8 @@ function appendGame(target) {
 
 //adds players
 function addPlayers() {
-  var player1 = database.ref('/player1');
-  var player2 = database.ref('/player2');
-  console.log(player1.val().status);
+  
 }
-addPlayers();
 
 // Click event listener for log in
 $('#play-btn').on('click', function() {
@@ -75,6 +73,18 @@ firebase.auth().onAuthStateChanged(function(firebaseUser) {
   }
 });
 
+player1ref.on('value',function(snapshot){
+  var user = firebase.auth().currentUser.displayName;
+  console.log(user)
+  if(snapshot.val().status == 'open'){
+    console.log('snapshot status: ' + snapshot.val().status)
+    console.log('snapshot name: ' + snapshot.val().name)
+    snapshot.val().update({
+      name: user.displayName
+    })
+  }
+})
+
 
 // //Player 1 value listener
 // database.ref('/player1').on('value', function(snapshot) {
@@ -104,3 +114,34 @@ firebase.auth().onAuthStateChanged(function(firebaseUser) {
 //     console.log('You are Player 2')
 //   }
 // })
+
+//RPS game logic
+// function compare (choice1, choice2) {
+//     if(choice1 === choice2) {
+//         return "The result is a tie!";
+//     }
+//     else if(choice1 === "rock") {
+//         if(choice2 === "scissors") {
+//             return "rock wins";
+//         }
+//     else{
+//         return"paper wins";
+//     }
+//     }
+//     else if(choice1 === "paper") {
+//         if(choice2 === "rock") {
+//             return "paper wins";
+//         }
+//     }
+//     else {
+//         return "scissors wins";
+//     }
+//     else if(choice1 === "scissors") {
+//         if(choice2 === "rock") {
+//             return "rock wins";
+//         }
+//     else {
+//         return "scissors wins";
+//     }
+//     }
+// }
