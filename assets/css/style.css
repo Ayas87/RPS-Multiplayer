@@ -1,42 +1,58 @@
 .title {
-	border: 1px solid black;
-	margin-bottom: 30px;
+  border: 1px solid black;
+  margin-bottom: 30px;
 }
+
 .main-game {
-	margin-top: 30px;
+  margin-top: 30px;
 }
+
 .message-box {
-	border: 1px solid black;
+  border: 1px solid black;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  font-size: 30px;
 }
+
 .turn-box {
-	border: 1px solid black;
+  border: 1px solid black;
 }
+
 .player1 {
-	border: 1px solid black;
-	height: 200px;
-	margin: 0px 20px;
+  border: 1px solid black;
+  height: 200px;
+  margin: 0px 20px;
 }
+
 .player2 {
-	border: 1px solid black;
-	height: 200px;
-	margin: 0px 20px;
+  border: 1px solid black;
+  height: 200px;
+  margin: 0px 20px;
 }
+
 .result {
-	border: 1px solid black;
-	height: 200px;
-	margin: 0px 20px;
+  border: 1px solid black;
+  height: 200px;
+  margin: 0px 20px;
 }
+
 .chatbox {
-	border: 1px solid black;
-	height: 200px;
-	margin-top: 30px
+  border: 1px solid black;
+  height: 200px;
+  margin-top: 30px
 }
-.play, .logout {
-	float:right;
+
+.login,
+.logout {
+  float: right;
 }
+
 .choices {
-	padding: 10px;
+  padding: 10px;
 }
-.rock, .paper, .scissors {
-	padding: 10px;
+
+.rock,
+.paper,
+.scissors {
+  padding: 10px;
 }
