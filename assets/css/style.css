@@ -42,8 +42,7 @@
   margin-top: 30px
 }
 
-.login,
-.logout {
+.login, .logout {
   float: right;
 }
 
@@ -51,8 +50,6 @@
   padding: 10px;
 }
 
-.rock,
-.paper,
-.scissors {
+.rock, .paper, .scissors {
   padding: 10px;
 }
