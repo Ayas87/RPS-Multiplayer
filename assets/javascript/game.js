@@ -13,15 +13,20 @@ firebase.initializeApp(config);
 var database = firebase.database();
 var player1ref = database.ref('/player1');
 var player2ref = database.ref('/player2');
-var userStatus = 'spectator';
-var user;
+var userStatus = 'a spectator';
+var user = 'spectator';
 var userUid;
 var signedIn = false;
 var player1Status = 'open';
 var player1Status = 'open';
 
-//debug
-function debug () {
+
+
+
+
+
+//console log useful info
+function debug() {
   console.log('user: ' + user.displayName);
   console.log('userUid: ' + userUid);
   console.log('signedIn: ' + signedIn);
@@ -29,48 +34,90 @@ function debug () {
 }
 
 //reset db
-function resetDb () {
-  resetPlayerOne ();
-  resetPlayerTwo ();
+function resetDb() {
+  resetPlayerOne();
+  resetPlayerTwo();
 };
 
-function resetPlayerOne () {
+//debug btns
+function debugBtns() {
+  $('.debug').on('click',function(){
+    debug();
+  })
+  $('.reset').on('click',function(){
+    resetDb();
+  })
+}
+debugBtns();
+
+
+
+
+
+
+
+
+function resetPlayerOne() {
   player1ref.update({
     status: 'open',
     name: 'player1',
-    player2: 'false'
+    player2: 'false',
+    uid: 'player1uid',
+    choice: 'none',
+    wins: 0,
+    losses: 0,
   })
 }
-function resetPlayerTwo () {
+
+function resetPlayerTwo() {
   player2ref.update({
     status: 'open',
     name: 'player2',
-    player1: 'false'
+    player1: 'false',
+    uid: 'player2uid',
+    choice: 'none',
+    wins: 0,
+    losses: 0,
   })
 }
 
 
 //Starting game
 function startGame() {
-  
+
 };
 
-function appendGame(target) {
-  var rock = $('<div class="rock">Rock</div>')
-  var paper = $('<div class="paper">Paper</div>')
-  var scissors = $('<div class="scissors">Scissors</div>')
-  var choices = $('<div class="choices">Make your choice:</div><br>')
+function appendChoices(player) {
+  var rock = $('<li class="rock">Rock</li>')
+  var paper = $('<li class="paper">Paper</li>')
+  var scissors = $('<li class="scissors">Scissors</li>')
+  var choicesHeader = $('<div class="choicesHeader">Make your choice: </div>')
+  var choices = $('<ul class="choices list-unstyled">')
+  choices.append(choicesHeader)
   choices.append(rock)
   choices.append(paper)
   choices.append(scissors)
-  $(target).append(choices);
+  $(player).html(choices);
+  applyClickHanders();
+  // $(opponent).html('waiting');
 }
 
-function handleErrors (errors) {
+function removeAppendedChoices(player) {
+  $(player).empty();
+}
+
+function applyClickHanders() {
+  $('.choices').on('click', 'li', function() {
+    console.log($(this).text())
+    console.log(user)
+  })
+}
+
+function handleErrors(errors) {
   console.log(errors);
 }
 
-function changeLogInBtn (firebaseUser){
+function changeLogInBtn(firebaseUser) {
   if (firebaseUser) {
     $('.login').addClass('hide');
     $('.logout').removeClass('hide');
@@ -83,50 +130,73 @@ function changeLogInBtn (firebaseUser){
   }
 }
 
-  
-
-function playerOne () {
-player1ref.on('value', function(snapshot) {
-  if (snapshot.val().status == 'open' && userStatus === 'spectator' && signedIn === true) {
-    userStatus = 'player1';
-    player1ref.update({
-      name: user.displayName,
-      uid: userUid,
-      status: 'closed'
-    }).then(function(){
-      
-      $('.message-box').append('<div class="player">You are Player 1</div>');
-      player2ref.update({
-      player1: 'true'
-    });
-    })
-  }
-})
-}
-
-
-
-function playerTwo () {
-player2ref.on('value', function(snapshot) {
-  console.log('playerTwo function runs user status is ' + userStatus)
-  if (snapshot.val().status == 'open' && userStatus === 'spectator' && signedIn === true && player1Status === 'closed') {
-    userStatus = 'player2';
-    player2ref.update({
-      name: user.displayName,
-      uid: userUid,
-      status: 'closed'
-    }).then(function(){
-      
-      $('.message-box').append('<div class="player">You are Player 2</div>');
+function playerOne() {
+  player1ref.on('value', function(snapshot) {
+    if (snapshot.val().status == 'open' && userStatus === 'a spectator' && signedIn === true) {
+      userStatus = 'Player 1';
       player1ref.update({
-      player2: 'true'
-    });
-    })    
-  }
-})
+        name: user.displayName,
+        uid: userUid,
+        status: 'closed'
+      }).then(function() {
+        $('.message-box').append('<div class="player">You are Player 1</div>');
+        player2ref.update({
+          player1: 'true'
+        });
+      })
+    }
+  })
 }
 
+function playerTwo() {
+  player2ref.on('value', function(snapshot) {
+    console.log('playerTwo function runs user status is ' + userStatus)
+    if (snapshot.val().status == 'open' && userStatus === 'a spectator' && signedIn === true && player1Status === 'closed') {
+      userStatus = 'Player 2';
+      player2ref.update({
+        name: user.displayName,
+        uid: userUid,
+        status: 'closed'
+      }).then(function() {
+        $('.message-box').append('<div class="player">You are Player 2</div>');
+        player1ref.update({
+          player2: 'true'
+        });
+      })
+    }
+  })
+}
 
+function compare(choice1, choice2) {
+  if (choice1 === choice2) {
+    return "The result is a tie!";
+  }
+  if (choice1 === "Rock") {
+    if (choice2 === "Scissors") {
+      return "Rock wins";
+    } else {
+      return "Paper wins";
+    }
+  }
+  if (choice1 === "Paper") {
+    if (choice2 === "Rock") {
+      return "Paper wins";
+    } else {
+      return "Scissors wins";
+    }
+  }
+  if (choice1 === "Scissors") {
+    if (choice2 === "Rock") {
+      return "Rock wins";
+    } else {
+      return "Scissors wins";
+    }
+  }
+};
+
+function winner() {
+  console.log(compare('Scissors', 'Scissors'))
+}
 
 
 
@@ -141,36 +211,36 @@ $('#play-btn').on('click', function() {
     }).then(function() {
       userUid = firebase.auth().currentUser.uid;
       firebase.auth().onAuthStateChanged(function(firebaseUser) {
-        changeLogInBtn (firebaseUser)
-        // playerOne();
-        // playerTwo();
+        changeLogInBtn(firebaseUser)
+          // playerOne();
+          // playerTwo();
       });
-    }).then(function(){
-      debug();
+    }).then(function() {
       playerOne();
-    }).then(function(){
+    }).then(function() {
       playerTwo();
     })
-  }).catch(function(){
+  }).catch(function() {
     handleErrors()
   })
 });
 
 // Click event listener for log out
 $('.logout').on('click', function() {
-  if (userStatus === 'player1') {
+  if (userStatus === 'Player 1') {
     resetPlayerOne();
     player2ref.update({
       player1: 'false'
     })
-  } else if (userStatus === 'player2') {
+  } else if (userStatus === 'Player 2') {
     resetPlayerTwo();
     player1ref.update({
       player2: 'false'
     })
   };
   firebase.auth().currentUser.delete();
-  userStatus = 'spectator';
+  userStatus = 'a spectator';
+  user = 'spectator'
   signedIn = false;
 });
 
@@ -185,79 +255,23 @@ $('.logout').on('click', function() {
 
 //handlers
 firebase.auth().onAuthStateChanged(function(firebaseUser) {
-  changeLogInBtn (firebaseUser);
+  changeLogInBtn(firebaseUser);
 })
 
-player1ref.on('value',function(snapshot) {
+player1ref.on('value', function(snapshot) {
   player1Status = snapshot.val().status;
+  if (snapshot.val().uid === userUid) {
+    appendChoices('.player1');
+  } else {
+    removeAppendedChoices('.player1');
+  }
 })
 
-player2ref.on('value',function(snapshot) {
+player2ref.on('value', function(snapshot) {
   player2Status = snapshot.val().status;
+  if (snapshot.val().uid === userUid) {
+    appendChoices('.player2');
+  } else {
+    removeAppendedChoices('.player2');
+  }
 })
-
-
-
-
-
-
-
-
-
-
-// player2ref.on('value', function(snapshot) {
-//   var user = firebase.auth().currentUser.displayName;
-//   var userUid = firebase.auth().currentUser.uid
-//   if (snapshot.val().status == 'open' && userUid !== player1ref.val().uid) {
-//     console.log('line 79: player1 status is: ' + snapshot.val().status)
-//     player2ref.update({
-//       name: user,
-//       uid: userUid
-//     })
-//   }
-// })
-
-// database.ref('/player2').on('value', function(snapshot) {
-//   if (snapshot.val() === null && player1 === true) {
-//     console.log('no player 1 found or player 2 found');
-//     database.ref('/player2').set({
-//       name: auth.currentUser.displayName,
-//       id: auth.currentUser.uid,
-//       wins: wins,
-//       losses: losses
-//     })
-//     player2 = true;
-//     console.log('You are Player 2')
-//   }
-// })
-
-//RPS game logic
-// function compare (choice1, choice2) {
-//     if(choice1 === choice2) {
-//         return "The result is a tie!";
-//     }
-//     else if(choice1 === "rock") {
-//         if(choice2 === "scissors") {
-//             return "rock wins";
-//         }
-//     else{
-//         return"paper wins";
-//     }
-//     }
-//     else if(choice1 === "paper") {
-//         if(choice2 === "rock") {
-//             return "paper wins";
-//         }
-//     }
-//     else {
-//         return "scissors wins";
-//     }
-//     else if(choice1 === "scissors") {
-//         if(choice2 === "rock") {
-//             return "rock wins";
-//         }
-//     else {
-//         return "scissors wins";
-//     }
-//     }
-// }

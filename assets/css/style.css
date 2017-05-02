@@ -42,14 +42,45 @@
   margin-top: 30px
 }
 
-.login, .logout {
+.login,
+.logout {
   float: right;
 }
 
 .choices {
-  padding: 10px;
+  display: flex;
+  flex-direction: row;
+  align-content: stretch;
+  flex-wrap: wrap;
 }
 
-.rock, .paper, .scissors {
+.rock,
+.paper,
+.scissors,
+.choicesHeader {
   padding: 10px;
+  width: 100%;
+  margin: 5px;
+}
+
+.choicesHeader {
+  background-color: cornflowerblue;
+}
+
+.rock {
+  background-color: lightgrey;
+}
+
+.paper {
+  background-color: tan;
+}
+
+.scissors {
+  background-color: lightblue;
+}
+
+.rock:hover,
+.paper:hover,
+.scissors:hover {
+  border: 2px red solid;
 }
