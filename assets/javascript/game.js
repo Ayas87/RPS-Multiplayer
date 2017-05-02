@@ -37,11 +37,6 @@ function appendGame(target) {
   $(target).append(choices);
 }
 
-//adds players
-function addPlayers() {
-  
-}
-
 // Click event listener for log in
 $('#play-btn').on('click', function() {
   var name = $('#usr').val();
@@ -49,6 +44,18 @@ $('#play-btn').on('click', function() {
   firebase.auth().signInAnonymously().then(function(){
     firebase.auth().currentUser.updateProfile({
       displayName: name
+    }).then(function(){
+      firebase.auth().onAuthStateChanged(function(firebaseUser) {
+        if (firebaseUser) {
+          $('.login').addClass('hide');
+          $('.logout').removeClass('hide');
+          $('.message-box').html('Welcome ' + firebaseUser.displayName)
+        } else {
+          $('.login').removeClass('hide');
+          $('.logout').addClass('hide');
+          $('.message-box').html('Please log in')
+        }
+      });
     });
   })
 });
@@ -58,33 +65,17 @@ $('.logout').on('click', function() {
   firebase.auth().currentUser.delete();
 });
 
-//Auth listener
-firebase.auth().onAuthStateChanged(function(firebaseUser) {
-  var user = firebase.auth().currentUser;
-  if (firebaseUser) {
-    $('.login').addClass('hide');
-    $('.logout').removeClass('hide');
-    $('.message-box').html('Welcome ' + user.displayName)
-  } else {
-    $('.login').removeClass('hide');
-    $('.logout').addClass('hide');
-    $('.message-box').html('Please log in')
-    // user.delete()
-  }
-});
-
 player1ref.on('value',function(snapshot){
   var user = firebase.auth().currentUser.displayName;
-  console.log(user)
   if(snapshot.val().status == 'open'){
-    console.log('snapshot status: ' + snapshot.val().status)
-    console.log('snapshot name: ' + snapshot.val().name)
-    snapshot.val().update({
-      name: user.displayName
-    })
+    console.log('line 79: player1 status is: ' + snapshot.val().status)
+
+    // console.log('snapshot status: ' + snapshot.val().status)
+    // console.log('snapshot name: ' + snapshot.val().name)
+    // snapshot.val().update({
+    //   name: user.displayName
   }
 })
-
 
 // //Player 1 value listener
 // database.ref('/player1').on('value', function(snapshot) {
