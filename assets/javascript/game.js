@@ -17,27 +17,43 @@ var userStatus = 'spectator';
 var user;
 var userUid;
 var signedIn = false;
-
-
+var player1Status = 'open';
+var player1Status = 'open';
 
 //debug
 function debug () {
-  console.log('user: ' + user);
+  console.log('user: ' + user.displayName);
   console.log('userUid: ' + userUid);
-  console.log(signedIn);
-  console.log(userStatus);
+  console.log('signedIn: ' + signedIn);
+  console.log('userStatus: ' + userStatus);
 }
+
+//reset db
+function resetDb () {
+  resetPlayerOne ();
+  resetPlayerTwo ();
+};
+
+function resetPlayerOne () {
+  player1ref.update({
+    status: 'open',
+    name: 'player1',
+    player2: 'false'
+  })
+}
+function resetPlayerTwo () {
+  player2ref.update({
+    status: 'open',
+    name: 'player2',
+    player1: 'false'
+  })
+}
+
 
 //Starting game
 function startGame() {
-  player1ref.update({
-    status: 'open'
-  })
-  player2ref.update({
-    status: 'open'
-  })
+  
 };
-startGame();
 
 function appendGame(target) {
   var rock = $('<div class="rock">Rock</div>')
@@ -67,46 +83,41 @@ function changeLogInBtn (firebaseUser){
   }
 }
 
+  
+
 function playerOne () {
 player1ref.on('value', function(snapshot) {
-  if (snapshot.val().uid == userUid && userStatus === 'player1') {
-    $('.message-box').append('<div class="player">You are Player 1</div>');
-    player1ref.update({
-      status: 'closed'
-    })
-  } else if (snapshot.val().status == 'open' && userStatus === 'spectator' && signedIn === true) {
+  if (snapshot.val().status == 'open' && userStatus === 'spectator' && signedIn === true) {
+    userStatus = 'player1';
     player1ref.update({
       name: user.displayName,
       uid: userUid,
       status: 'closed'
     }).then(function(){
-      console.log('current user uid:  ' + userUid);
-      console.log('player1 uid:  ' + snapshot.val().uid);
-      userStatus = 'player1';
+      
+      $('.message-box').append('<div class="player">You are Player 1</div>');
       player2ref.update({
       player1: 'true'
     });
-    })    
+    })
   }
 })
 }
 
+
+
 function playerTwo () {
 player2ref.on('value', function(snapshot) {
-  if (snapshot.val().uid == userUid && userStatus === 'player2') {
-    $('.message-box').append('<div class="player">You are Player 2</div>');
-    player2ref.update({
-      status: 'closed'
-    })
-  } else if (snapshot.val().status == 'open' && userStatus === 'spectator' && signedIn === true && userStatus !== 'player1') {
+  console.log('playerTwo function runs user status is ' + userStatus)
+  if (snapshot.val().status == 'open' && userStatus === 'spectator' && signedIn === true && player1Status === 'closed') {
+    userStatus = 'player2';
     player2ref.update({
       name: user.displayName,
       uid: userUid,
       status: 'closed'
     }).then(function(){
-      console.log('current user uid:  ' + userUid);
-      console.log('player1 uid:  ' + snapshot.val().uid);
-      userStatus = 'player1';
+      
+      $('.message-box').append('<div class="player">You are Player 2</div>');
       player1ref.update({
       player2: 'true'
     });
@@ -125,29 +136,37 @@ $('#play-btn').on('click', function() {
   var name = $('#usr').val();
   firebase.auth().signInAnonymously().then(function() {
     user = firebase.auth().currentUser;
-    debug();
     firebase.auth().currentUser.updateProfile({
       displayName: name
     }).then(function() {
       userUid = firebase.auth().currentUser.uid;
       firebase.auth().onAuthStateChanged(function(firebaseUser) {
         changeLogInBtn (firebaseUser)
-        playerOne();
-        playerTwo();
+        // playerOne();
+        // playerTwo();
       });
+    }).then(function(){
+      debug();
+      playerOne();
+    }).then(function(){
+      playerTwo();
     })
-  }).catch(handleErrors())
+  }).catch(function(){
+    handleErrors()
+  })
 });
 
 // Click event listener for log out
 $('.logout').on('click', function() {
   if (userStatus === 'player1') {
-    player1ref.update({
-      status: 'open'
+    resetPlayerOne();
+    player2ref.update({
+      player1: 'false'
     })
   } else if (userStatus === 'player2') {
-    playe2ref.update({
-      status: 'open'
+    resetPlayerTwo();
+    player1ref.update({
+      player2: 'false'
     })
   };
   firebase.auth().currentUser.delete();
@@ -167,6 +186,14 @@ $('.logout').on('click', function() {
 //handlers
 firebase.auth().onAuthStateChanged(function(firebaseUser) {
   changeLogInBtn (firebaseUser);
+})
+
+player1ref.on('value',function(snapshot) {
+  player1Status = snapshot.val().status;
+})
+
+player2ref.on('value',function(snapshot) {
+  player2Status = snapshot.val().status;
 })
 
 
