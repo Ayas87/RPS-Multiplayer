@@ -18,7 +18,7 @@ var user = 'spectator';
 var userUid;
 var signedIn = false;
 var player1Status = 'open';
-var player1Status = 'open';
+var player2Status = 'open';
 
 
 
@@ -109,7 +109,8 @@ function removeAppendedChoices(player) {
 function applyClickHanders() {
   $('.choices').on('click', 'li', function() {
     console.log($(this).text())
-    console.log(user)
+    console.log(userStatus)
+    winner();
   })
 }
 
@@ -195,7 +196,7 @@ function compare(choice1, choice2) {
 };
 
 function winner() {
-  console.log(compare('Scissors', 'Scissors'))
+  $('.result').html(compare('Scissors', 'Scissors'));
 }
 
 
